@@ -357,7 +357,7 @@ r1, r2 `ip r`
 
 Применяю настройки на обеих машинах `netplan apply`
 
-Перезагружаю ws21 `reboot`
+Перезагружаю ws21, ws22 `reboot`
 
 Проверяю, полученный от DHCP адрес
 
@@ -429,35 +429,33 @@ ws21 `ip a`
 
 В файле /etc/apache2/ports.conf на ws22 и r1 меняю строку Listen 80 на Listen 0.0.0.0:80
 
-![ports.conf](misc/part_7/1.png)
+![ports.conf](Screenshots/7_1.png)
 
 Запускаю веб-сервер на ws22 и r1 `service apache2 start` и проверяю `systemctl status apache2`
 
-![start apache 2](misc/part_7/2.png)
-
-![start apache 2](misc/part_7/3.png)
+![start apache 2](Screenshots/7_2.png)
 
 Создаю файл /etc/firewall.sh, имитирующий фаервол на r2 `nano /etc/firewall.sh`
 
-![r2 /etc/firewall.sh](misc/part_7/4.png)
+![r2 /etc/firewall.sh](Screenshots/7_3.png)
 
 Запускаю файл `chmod +x /etc/firewall.sh` и `/etc/firewall.sh`
 
 Пингую ws22 с r1 
 
-![ping ws22 from r1](misc/part_7/5.png)
+![ping ws22 from r1](Screenshots/7_4.png)
 
 Добавляю в фаервол еще одно правило
 
-![r2 /etc/firewall.sh](misc/part_7/6.png)
+![r2 /etc/firewall.sh](Screenshots/7_5.png)
 
 Пингую ws22 с r1 
 
-![ping ws22 from r1](misc/part_7/7.png)
+![ping ws22 from r1](Screenshots/7_6.png)
 
 Добавляю еще правила в фаервол
 
-![r2 /etc/firewall.sh](misc/part_7/8.png)
+![r2 /etc/firewall.sh](Screenshots/7_7.png)
 
 >- t - указывает на используемую таблицу
 >- p - указывает протокол, такие как tcp, udp, udplite и другие, поддерживаемые системой, ознакомиться со списком можно в файле /etc/protocols
@@ -473,7 +471,13 @@ ws21 `ip a`
 
 Проверяю соединение по TCP для SNAT, для этого с ws22 подключаюсь к серверу Apache на r1 `telnet 10.100.0.11 80`
 
-![telnet](misc/part_7/9.png)
+![telnet](Screenshots/7_8.png)
+
+Проверяю соединение по TCP для DNAT, для этого с r1 подключаюсь к серверу Apache на r2 `telnet 10.100.0.12 8080`
+
+![telnet](Screenshots/7_9.png)
+
+>Telnet - это сетевая утилита, которая позволяет соединиться с удаленным портом любого компьютера и установить интерактивный канал связи. В Linux, telnet используется для взаимодействия с удаленными серверами через текстовый терминал. Она позволяет выполнять команды на удаленном сервере и управлять им. Telnet работает через протокол TCP и обычно использует порт 23 для соединения. Для использования telnet в Linux, можно установить утилиту из официальных репозиториев, например, в Ubuntu с помощью команды "sudo apt install telnet". Telnet также позволяет проверить доступность порта на удаленном узле, что может быть полезно для различных задач.
 
 ## Часть 8. Допополнительно. Знакомство с SSH Tunnels
 
@@ -481,26 +485,26 @@ ws21 `ip a`
 
 В файле /etc/apache2/ports.conf меняю строку Listen 80 на Listen localhost:80
 
-![ports.conf](misc/part_8/1.png)
+![ports.conf](Screenshots/8_2.png)
 
 Запускаю веб-сервер на ws22  `service apache2 start` и проверяю `systemctl status apache2`
 
-![start apache 2](misc/part_8/2.png)
+![start apache 2](Screenshots/8_3.png)
 
 Запускаю фаервол на r2 `/etc/firewall.sh`
 
-![firewall r2](misc/part_8/3.png)
+![firewall r2](Screenshots/8_1.png)
 
 Local TCP forwarding с ws21 до ws22
 
-![Local TCP](misc/part_8/4.png)
+![Local TCP](Screenshots/8_4.png)
 
-![telenet ](misc/part_8/5.png)
+![telenet ](Screenshots/8_5.png)
 
 Remote TCP forwarding c ws11 до ws22
 
-![Local TCP](misc/part_8/6.png)
+![Local TCP](Screenshots/8_6.png)
 
-![telenet ](misc/part_8/7.png)
+![telenet ](Screenshots/8_7.png)
 
 [Оглавление](#оглавление)
