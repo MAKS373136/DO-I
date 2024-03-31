@@ -339,21 +339,21 @@ r1, r2 `ip r`
 
 Открываю конфиг и добавляю изменения в r2 `nano  /etc/dhcp/dhcpd.conf`
 
-![dhcpd.conf](misc/part_6/1.png)
+![dhcpd.conf](Screenshots/6_1.png)
 
 В файл resolv.conf прописываю nameserver 8.8.8.8
 
-![resolv.conf](misc/part_6/2.png)
+![resolv.conf](Screenshots/6_2.png)
 
 Перезагружаю службу DHCP `systemctl restart isc-dhcp-server` и проверяю ее статус `systemctl status isc-dhcp-server`
 
-![r2 dhcp status](misc/part_6/3.png)
+![r2 dhcp status](Screenshots/6_3.png)
 
 Обновляю настройки в ws21 и ws22
 
-![ws21 /etc/netplan/00-installer-config.yaml](misc/part_6/4.png)
+![ws21, /etc/netplan/00-installer-config.yaml](Screenshots/6_4_0.png)
 
-![ws22 /etc/netplan/00-installer-config.yaml](misc/part_6/5.png)
+![ws22 /etc/netplan/00-installer-config.yaml](Screenshots/6_4_1.png)
 
 Применяю настройки на обеих машинах `netplan apply`
 
@@ -361,27 +361,23 @@ r1, r2 `ip r`
 
 Проверяю, полученный от DHCP адрес
 
-ws21 `ip a`
+ws21, ws22 `ip a`
 
-![ws21 ip a](misc/part_6/6.png)
+![ws21, ws22 ip a](Screenshots/6_4_2.png)
 
-ws22 `ip a`
+Пингую ws22 с ws21  `ping -c 4 10.20.0.3`
 
-![ws22 ip a](misc/part_6/7.png)
+![ping ws 22](Screenshots/6_5.png)
 
-Пингую ws22 с ws21  `ping -c 4 10.20.0.5`
-
-![ws22 ip a](misc/part_6/8.png)
-
-Указываю MAC адрес у ws21
+Указываю MAC адрес у ws11
 
 В настройках VB
 
-![ws11 mac](misc/part_6/9.png)
+![ws11 mac](Screenshots/6_6.png)
 
 В конфигурационном файле
 
-![ws11 yaml mac](misc/part_6/10.png)
+![ws11 yaml mac](Screenshots/6_7.png)
 
 #### Для r1 настраиваю аналогично r2, но делаю выдачу адресов с жесткой привязкой к MAC-адресу (ws11)
 
