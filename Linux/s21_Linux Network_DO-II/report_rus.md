@@ -11,7 +11,7 @@
 [Часть 5. Статическая маршрутизация сети](#часть-5-статическая-маршрутизация-сети)  
 [Часть 6. Динамическая настройка IP с помощью DHCP](#часть-6-динамическая-настройка-ip-с-помощью-dhcp)  
 [Часть 7. NAT](#часть-7-nat)  
-[Часть 8. Допополнительно. Знакомство с SSH Tunnels](#часть-8-дополнительно-знакомство-с-ssh-tunnels) 
+[Часть 8. Допополнительно. Знакомство с SSH Tunnels](#часть-8-допополнительно-знакомство-с-ssh-tunnels)
 
 
 ## Часть 1. Инструмент ipcalc
@@ -63,9 +63,6 @@
 `ipcalc 12.167.38.4/16`
 
 ![ipcalc 12.167.38.4/16](Screenshots/1_6.png)
-
-- HostMin: 12.167.0.1
-- HostMax: 12.167.255.254
 
 #### Минимальный и максимальный хост в сети 12.167.38.4/255.255.254.0 
 
@@ -140,47 +137,50 @@
 ## Часть 2. Статическая маршрутизация между двумя машинами
 #### Поднять две виртуальные машины (далее -- ws1 и ws2)
 
-Клонирую первую машину, добавляю локальную сеть, устанавливаю имя хоста ws2 
-`hostnamectl set-hostname ws2`
+Клонирую первую машину, добавляю локальную сеть, устанавливаю имя хоста ws2 `hostnamectl set-hostname ws2`
 
 ##### С помощью команды ip a посмотреть существующие сетевые интерфейсы
 
-ws1, ws2 `ip a`
+ws1 `ip a`
 
-![ws1, ws2 ip a](Screenshots/2_1.png)
+![ws1 ip a](Screenshots/2_1.png)
+
+ws2 `ip a`
+
+![ws2 ip a](Screenshots/2_2.png)
+
 
 ##### На обеих машинах задать следующие адреса и маски: ws1 - 192.168.100.10, маска /16, ws2 - 172.24.116.8, маска /12
 
-Для каждой из машин `sudo nano /etc/netplan/00-installer-config.yaml` 
+Для каждой из машин `nano /etc/netplan/00-installer-config.yaml` и применяем настройки `netplan apply`
 
-![netplan config ws1, ws2](Screenshots/2_2.png)
-
->Сетевой интерфейс внутренней сети на виртуальной машине характеризуется следующими параметрами:
->имя сетевого интерфейса (например, ens32),
->IP-адрес (например, 192.168.100.4),
->маска подсети (например, /24 для класса C),
->тип интерфейса (например, Ethernet),
->роут по умолчанию (который часто совпадает с IP-адресом шлюза подсети)
-
+![netplan config ws1](Screenshots/2_3.png)
+![netplan config ws2](Screenshots/2_4.png)
 
 ### 2.1. Добавление статического маршрута вручную
+#### Пингую соединение между машинами
 
-`ip r add 172.24.116.8 dev enp0s3` и `ip r add 192.168.100.10 dev enp0s3`
+` ip r add 172.24.116.8 dev enp0s3` и `ping -c 4 172.24.116.8`
 
-`ping -c 4 172.24.116.8` и `ping -c 4 192.168.100.10`
+![ws1 ip r add, ping](Screenshots/2_5.png)
 
-![ws1, ws2 ip r add](Screenshots/2_3.png)
+` ip r add 192.168.100.10 dev enp0s3` и `ping -c 4 192.168.100.10`
+
+![ws2 ip r add, ping](Screenshots/2_6.png)
 
 ### 2.2. Добавление статического маршрута с сохранением
 
-Перезапускаю машины `sudo reboot`
+Перезапускаю машины `reboot`
 
 #### Добавить статический маршрут от одной машины до другой с помощью файла etc/netplan/00-installer-config.yaml
+#### Пингую соединение между машинами
 
-Для каждой из машин `sudo nano /etc/netplan/00-installer-config.yaml` и
-`ping -c 4 172.24.116.8, 192.168.100.10`
+Для каждой из машин `nano /etc/netplan/00-installer-config.yaml` 
+Применяем настройки `netplan apply`
+`ping -c 4 172.24.116.8` и `ping -c 4 192.168.100.10`
 
-![netplan config ws1, ws2](Screenshots/2_4.png)
+![netplan config ws1](Screenshots/2_7.png)
+![netplan config ws2](Screenshots/2_8.png)
 
 ## Часть 3. Утилита iperf3
 #### Перевести и записать в отчёт: 8 Mbps в MB/s, 100 MB/s в Kbps, 1 Gbps в Mbps
@@ -215,177 +215,120 @@ ws1, ws2 `ip a`
 
 ### 4.2. Утилита nmap
 
- Пингую машины, затем вызываю утилиту nmap 
+ Пингую машины, затем вызываю утилиту nmap, вывод nmap должен показать (хост машины запущен) `Host is up`
 
 ![nmap](Screenshots/4_3.png)
 
 ## Часть 5. Статическая маршрутизация сети
+
 ### 5.1. Настройка адресов машин
 #### Настраиваю конфигурацию машин согласно схеме на рисунке
 
-![network](../misc/images/part5_network.png)
+![network](Screenshots/5_1.png)
 
 
-ws11 
+netplan ws11, ws21, ws22, r1, r2 
 
-![ws11 etc/netplan/00-installer-config.yaml](misc/part_5/1.png)
+![ws11, ws21, ws22, r1, r2  etc/netplan/00-installer-config.yaml](Screenshots/5_2.png)
 
-ws22
-
-![ws22 etc/netplan/00-installer-config.yaml](misc/part_5/2.png)
-
-ws21 
-
-![ws21 etc/netplan/00-installer-config.yaml](misc/part_5/3.png)
-
-r1
-
-![r1 etc/netplan/00-installer-config.yaml](misc/part_5/4.png)
-
-r2
-
-![r2 etc/netplan/00-installer-config.yaml](misc/part_5/5.png)
-
-Применяю настройки на каждой из машин `sudo netplan apply`
+Применяю настройки на каждой из машин `netplan apply`
 
 Проверяю настройки на каждой машине `ip -4 a`
 
-ws11 
+ws11, ws21, ws22, r1, r2
 
-![ws11 ip -4 a](misc/part_5/6.png)
-
-ws22 
-
-![ws22 ip -4 a](misc/part_5/7.png)
-
-ws21 
-
-![ws21 ip -4 a](misc/part_5/8.png)
-
-r1 
-
-![r1 ip -4 a](misc/part_5/9.png)
-
-r2
-
-![r2 ip -4 a](misc/part_5/10.png)
+![ws11 ip -4 a](Screenshots/5_3.png)
 
 Пингую ws22 с ws21 `ping -c 4 10.20.0.20`
 
-![ping ws22 с ws21](misc/part_5/11.png)
+![ping ws22 с ws21](Screenshots/5_4.png)
 
 Пингую r1 с ws11 `ping -c 4 10.10.0.1`
 
-![ping r1 с ws11](misc/part_5/12.png)
+![ping r1 с ws11](Screenshots/5_5.png)
 
 ### 5.2. Включение переадресации IP-адресов.
 
-Включаю переадресацию IP, на роутерах `sudo sysctl -w net.ipv4.ip_forward=1`
+Включаю переадресацию IP, на роутерах `sysctl -w net.ipv4.ip_forward=1`
 
-![переадресации IP r1](misc/part_5/13.png)
+![переадресации IP r1, r2](Screenshots/5_6.png)
 
-![переадресации IP r2](misc/part_5/14.png)
+Открываю файл конфигурации на обеих машинах `nano /etc/sysctl.conf`
 
-Открываю файл конфигурации на обеих машинах `sudo nano /etc/sysctl.conf`
-
-![/etc/sysctl.conf](misc/part_5/15.png)
+![/etc/sysctl.conf](Screenshots/5_7.png)
 
 ### 5.3. Установка маршрута по-умолчанию
+
 #### Настриваю маршрут по-умолчанию (шлюз) для рабочих станций
-ws11 
 
-![ws11 etc/netplan/00-installer-config.yaml](misc/part_5/16.png)
+ws11, ws21, ws22
 
-ws22
+![ws11, ws21, ws22 etc/netplan/00-installer-config.yaml](Screenshots/5_8.png)
 
-![ws22 etc/netplan/00-installer-config.yaml](misc/part_5/17.png)
+Применяю настройки на каждой из машин `netplan apply`
 
-ws21 
+#### Проверяю таблицы маршрутиризации
 
-![ws21 etc/netplan/00-installer-config.yaml](misc/part_5/18.png)
+ws11, ws21, ws22 `ip r`
 
-Применяю настройки на каждой из машин `sudo netplan apply`
-
-#### Проверею таблицы маршрутиризации
-
-ws11 `ip r`
-
-![ws11 ip r](misc/part_5/19.png)
-
-ws22 `ip r`
-
-![ws22 ip r](misc/part_5/21.png)
-
-ws21 `ip r`
-
-![ws21 ip r](misc/part_5/20.png)
+![ws11 ip r](Screenshots/5_9.png)
 
 #### Пингую r2 с ws11
 
-`ping -c 4 10.100.0.12`
+ws11 `ping -c 4 10.100.0.12` и смотрю в r2 `tcpdump -tn -i enp0s8`
 
-![ws21 ip r](misc/part_5/22.png)
-
-Смотрю в r2 `sudo tcpdump -tn -i enp0s8`
-
-![ws21 ip r](misc/part_5/23.png)
+![ws21 ip r](Screenshots/5_10.png)
 
 ### 5.4. Добавление статических маршрутов
 
 Добавляю в роутеры r1 и r2 статические маршруты в файле конфигурации
 
-r1
+r1, r2
 
-![r1 etc/netplan/00-installer-config.yaml](misc/part_5/24.png)
+![r1, r2 etc/netplan/00-installer-config.yaml](Screenshots/5_11.png)
 
-r2
-
-![r2 etc/netplan/00-installer-config.yaml](misc/part_5/25.png)
-
-Применяю настройки на обеих роутерах `sudo netplan apply`
+Применяю настройки на обеих роутерах `netplan apply`
 
 
-r1 `ip r`
+r1, r2 `ip r`
 
-![r1 ip r](misc/part_5/26.png)
-
-r2 `ip r`
-
-![r2 ip r](misc/part_5/27.png)
+![r1, r2 ip r](Screenshots/5_12.png)
 
 Запускаю команды `ip r list 10.10.0.0/18` и `ip r list 0.0.0.0/0` на ws11
 
-![r2 ip r](misc/part_5/28.png)
+![ws11 ip r](Screenshots/5_13.png)
 
 >ws11 соединена с сетью 10.10.0.0/18 поэтому, подключение произошло напрямую, но не соединена с 0.0.0.0/0 - сработало дефолное подключение через роутер.
 
 ### 5.5. Построение списка маршрутизаторов
 
- Запускаю команду дампа на r1 `sudo tcpdump -tnv -i enp0s8`
+ Запускаю команду дампа на r1 `tcpdump -tnv -i enp0s8`
 
-![r1 dump](misc/part_5/29.png)
+![r1 dump](Screenshots/5_14.png)
 
 На ws11 `traceroute 10.20.0.10`
 
-![ws11 traceroute 10.20.0.10](misc/part_5/30.png)
+![ws11 traceroute 10.20.0.10](Screenshots/5_15.png)
+
+>Для определения промежуточных маршрутизаторов traceroute отправляет целевому узлу серию ICMP-пакетов (по умолчанию 3 пакета), с каждым шагом увеличивая значение поля TTL («время жизни») на 1. Это поле обычно указывает максимальное количество маршрутизаторов, которое может быть пройдено пакетом. Первая серия пакетов отправляется с TTL, равным 1, и поэтому первый же маршрутизатор возвращает обратно ICMP-сообщение «time exceeded in transit», указывающее на невозможность доставки данных. Traceroute фиксирует адрес маршрутизатора, а также время между отправкой пакета и получением ответа (эти сведения выводятся на монитор компьютера). Затем traceroute повторяет отправку серии пакетов, но уже с TTL, равным 2, что заставляет первый маршрутизатор уменьшить TTL пакетов на единицу и направить их ко второму маршрутизатору. Второй маршрутизатор, получив пакеты с TTL=1, так же возвращает «time exceeded in transit». Процесс повторяется до тех пор, пока пакет не достигнет целевого узла, тем самым увеличивая значение ttl. При получении ответа от этого узла процесс трассировки считается завершённым.
 
 ### 5.6. Использование протокола ICMP при маршрутизации
 
 Запускаю на r1 перехват сетевого трафика `tcpdump -n -i enp0s8 icmp`
 
-![r1 dump](misc/part_5/31.png)
+![r1 dump](Screenshots/5_16.png)
 
 Пингую с ws11 несуществующий IP `ping -c 1 10.30.0.111`
 
-![ws11 ping](misc/part_5/32.png)
+![ws11 ping](Screenshots/5_17.png)
 
 ## Часть 6. Динамическая настройка IP с помощью DHCP
 
 #### Для r2 настраиваю конфигурацию службы DHCP:
 
-Устанавливаю утилиту `sudo apt-get install isc-dhcp-server`
+Устанавливаю утилиту `apt-get install isc-dhcp-server`
 
-Открываю конфиг и добавляю изменения в r2 `sudo nano  /etc/dhcp/dhcpd.conf`
+Открываю конфиг и добавляю изменения в r2 `nano  /etc/dhcp/dhcpd.conf`
 
 ![dhcpd.conf](misc/part_6/1.png)
 
@@ -403,9 +346,9 @@ r2 `ip r`
 
 ![ws22 /etc/netplan/00-installer-config.yaml](misc/part_6/5.png)
 
-Применяю настройки на обеих машинах `sudo netplan apply`
+Применяю настройки на обеих машинах `netplan apply`
 
-Перезагружаю ws21 `sudo reboot`
+Перезагружаю ws21 `reboot`
 
 Проверяю, полученный от DHCP адрес
 
@@ -433,9 +376,9 @@ ws22 `ip a`
 
 #### Для r1 настраиваю аналогично r2, но делаю выдачу адресов с жесткой привязкой к MAC-адресу (ws11)
 
-Устанавливаю утилиту `sudo apt-get install isc-dhcp-server`
+Устанавливаю утилиту `apt-get install isc-dhcp-server`
 
-Открываю конфиг и добавляю изменения в r1 `sudo nano  /etc/dhcp/dhcpd.conf`
+Открываю конфиг и добавляю изменения в r1 `nano  /etc/dhcp/dhcpd.conf`
 
 ![dhcpd.conf](misc/part_6/11.png)
 
@@ -451,7 +394,7 @@ ws22 `ip a`
 
 ![ws11 /etc/netplan/00-installer-config.yaml](misc/part_6/13.png)
 
-Применяю настройки `sudo netplan apply`
+Применяю настройки `netplan apply`
 
 ws11 `ip a`
 
@@ -467,7 +410,7 @@ ip на ws21 до запроса нового `ip a`
 
 ![ws11 ip a](misc/part_6/16.png)
 
-Запрос нового ip `sudo dhclient -v`
+Запрос нового ip `dhclient -v`
 
 > -v - получение нового ip
 
@@ -477,7 +420,7 @@ ws11 `ip a`
 
 ## Часть 7. NAT
 
-Устанавливаю apache `sudo apt install apache2`
+Устанавливаю apache `apt install apache2`
 
 В файле /etc/apache2/ports.conf на ws22 и r1 меняю строку Listen 80 на Listen 0.0.0.0:80
 
@@ -489,11 +432,11 @@ ws11 `ip a`
 
 ![start apache 2](misc/part_7/3.png)
 
-Создаю файл /etc/firewall.sh, имитирующий фаервол на r2 `sudo nano /etc/firewall.sh`
+Создаю файл /etc/firewall.sh, имитирующий фаервол на r2 `nano /etc/firewall.sh`
 
 ![r2 /etc/firewall.sh](misc/part_7/4.png)
 
-Запускаю файл `sudo chmod +x /etc/firewall.sh` и `sudo /etc/firewall.sh`
+Запускаю файл `chmod +x /etc/firewall.sh` и `/etc/firewall.sh`
 
 Пингую ws22 с r1 
 
@@ -521,15 +464,15 @@ ws11 `ip a`
 >- DNAT — подменяет адрес получателя в заголовке - IP-пакета, основное применение — предоставление доступа к сервисам снаружи, находящимся внутри сети
 >- SNAT — служит для преобразования сетевых адресов, применимо, когда за сервером находятся машины, которым необходимо предоставить доступ в Интернет, при этом от провайдера имеется статический IP-адрес
 
-Запускаю `sudo /etc/firewall.sh`
+Запускаю `/etc/firewall.sh`
 
-Проверяю соединение по TCP для SNAT, для этого с ws22 подключаюсь к серверу Apache на r1 `sudo telnet 10.100.0.11 80`
+Проверяю соединение по TCP для SNAT, для этого с ws22 подключаюсь к серверу Apache на r1 `telnet 10.100.0.11 80`
 
 ![telnet](misc/part_7/9.png)
 
 ## Часть 8. Допополнительно. Знакомство с SSH Tunnels
 
-Устанавливаю apache на ws22 `sudo apt install apache2`
+Устанавливаю apache на ws22 `apt install apache2`
 
 В файле /etc/apache2/ports.conf меняю строку Listen 80 на Listen localhost:80
 
@@ -539,7 +482,7 @@ ws11 `ip a`
 
 ![start apache 2](misc/part_8/2.png)
 
-Запускаю фаервол на r2 `sudo /etc/firewall.sh`
+Запускаю фаервол на r2 `/etc/firewall.sh`
 
 ![firewall r2](misc/part_8/3.png)
 
