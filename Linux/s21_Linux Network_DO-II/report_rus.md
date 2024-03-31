@@ -193,7 +193,7 @@ ws2 `ip a`
 
 #### Измерить скорость соединения между ws1 и ws2
 
-Слушаю на стороне сервера `iperf3 -s -f K` и на стороне клиента `-с 192.168.100.10`
+Слушаю на стороне сервера `iperf3 -s -f K` и на стороне клиента `iperf3 -с 192.168.100.10 -f K`
 
 ![iperf3](Screenshots/3_1.png)
 ![iperf3](Screenshots/3_2.png)
@@ -211,16 +211,22 @@ ws2 `ip a`
 
 ![/etc/firewall.sh](Screenshots/4_1.png)
 
-Запускаю файлы на обеих машинах командами `chmod +x /etc/firewall.sh` и `sh /etc/firewall.sh`
+Запускаю файлы на обеих машинах командами `chmod +x /etc/firewall.sh` и `/etc/firewall.sh`
 
-![chmod +x /etc/firewall.sh](Screenshots/4_2.png)
-
+![/etc/firewall.sh](Screenshots/4_2.png)
+![/etc/firewall.sh](Screenshots/4_3.png)
 
 ### 4.2. Утилита nmap
 
  Пингую машины, затем вызываю утилиту nmap, вывод nmap должен показать (хост машины запущен) `Host is up`
 
-![nmap](Screenshots/4_3.png)
+ `ping ws2 с ws1`
+
+![ping](Screenshots/4_4.png)
+
+`ping ws1 с ws2` and `nmap ws1`
+
+![nmap](Screenshots/4_5.png)
 
 ## Часть 5. Статическая маршрутизация сети
 
