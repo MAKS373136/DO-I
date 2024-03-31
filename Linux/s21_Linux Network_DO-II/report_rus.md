@@ -385,43 +385,43 @@ ws21, ws22 `ip a`
 
 Открываю конфиг и добавляю изменения в r1 `nano  /etc/dhcp/dhcpd.conf`
 
-![dhcpd.conf](misc/part_6/11.png)
+![dhcpd.conf](Screenshots/6_8.png)
 
 В файл resolv.conf прописываю nameserver 8.8.8.8
 
-![resolv.conf](misc/part_6/2.png)
+![resolv.conf](Screenshots/6_9.png)
 
 Перезагружаю службу DHCP `systemctl restart isc-dhcp-server` и проверяю ее статус `systemctl status isc-dhcp-server`
 
-![r2 dhcp status](misc/part_6/12.png)
+![r2 dhcp status](Screenshots/6_10.png)
 
 Обновляю настройки в ws11
 
-![ws11 /etc/netplan/00-installer-config.yaml](misc/part_6/13.png)
+![ws11 /etc/netplan/00-installer-config.yaml](Screenshots/6_11_0.png)
 
 Применяю настройки `netplan apply`
 
 ws11 `ip a`
 
-![ws11 ip a](misc/part_6/14.png)
+![ws11 ip a](Screenshots/6_11_1.png)
 
 Пингую ws11 с ws22  `ping -c 4 10.10.0.2`
 
-![ws11 ping](misc/part_6/15.png)
+![ws11 ping](Screenshots/6_11_2.png)
 
 #### Запрашиваю с ws21 обновление ip адреса
 
 ip на ws21 до запроса нового `ip a`
 
-![ws11 ip a](misc/part_6/16.png)
+![ws21 ip a](Screenshots/6_12.png)
 
 Запрос нового ip `dhclient -v`
 
 > -v - получение нового ip
 
-ws11 `ip a`
+ws21 `ip a`
 
-![ws11 ip a](misc/part_6/17.png)
+![ws21 ip a](Screenshots/6_13.png)
 
 ## Часть 7. NAT
 
