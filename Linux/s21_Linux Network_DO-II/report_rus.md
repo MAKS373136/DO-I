@@ -176,7 +176,9 @@ ws2 `ip a`
 #### Пингую соединение между машинами
 
 Для каждой из машин `nano /etc/netplan/00-installer-config.yaml` 
+
 Применяем настройки `netplan apply`
+
 `ping -c 4 172.24.116.8` и `ping -c 4 192.168.100.10`
 
 ![netplan config ws1](Screenshots/2_7.png)
